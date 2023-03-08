@@ -1,72 +1,75 @@
 //
 //  Nav.swift
-//  AlpineUI
+//  BetterNav
 //
 //  Created by Jenya Lebid on 3/7/23.
 //
 
 import SwiftUI
 
+public final class Nav: ObservableObject {
+    
+    public enum Action {
+        case open
+        case back
+    }
+    
+    static var navs = [String: Nav]()
 
-// Generic - Faster
-//public protocol NavViewer {
-//    func viewType<Content: NavHost>(as content: Content.Type, for _: Viewable?) -> Content
-//}
+    var id: String
 
-// Existential - Slower
-public protocol NavViewer {
-    associatedtype Content: View
-
-    func viewType(for _: Viewable?) -> Content
+    @Published var stack = [Viewable]()
+    @Published var stackPosition = 0
+    
+    public init(id: String) {
+        self.id = id
+        Nav.navs[id] = self
+    }
 }
 
-public protocol NavHost: View {
-    var object: Viewable? { get }
-}
-
-public final class Nav {
-
-    static public var stack = [Viewable]()
-    static var stackCount = 0
+extension Nav {
+    
+    var isInRootView: Bool {
+        stackPosition == 0
+    }
+    
+    var isInLastView: Bool {
+        !isInRootView && stackPosition == stack.count
+    }
 }
 
 public extension Nav {
     
-    static var last: Viewable? {
-        Nav.stack.last
-    }
-    
-    static func openView(for object: Viewable) {
-        Self.stack.append(object)
-        NotificationCenter.default.post(Notification(name: Notification.Name("Nav_Object_Open"), object: object, userInfo: ["postion": Self.stack.count - 1]))
-    }
-    
-    static func goBack() {
-        NotificationCenter.default.post(Notification(name: Notification.Name("Nav_Move"), userInfo: ["direction": "back"]))
-    }
-    
-    static func goForward() {
-        NotificationCenter.default.post(Notification(name: Notification.Name("Nav_Move"), userInfo: ["direction": "forward"]))
+    static func openView(for object: Viewable, in nav: String) {
+        guard let nav = Nav.navs[nav] else {
+            return
+        }
+        nav.stack.append(object)
+        nav.stackPosition = nav.stack.count
+        NotificationCenter.default.post(Notification(name: Notification.Name("Nav_Action"), object: object, userInfo: ["action": Nav.Action.open]))
     }
 }
 
-//struct Na: NavHost {
-//
-//    var object: Viewable?
-//
-//    var body: some View {
-//        EmptyView()
-//    }
-//}
-//
-//class bb: NN {
-//
-//    func h(_: Viewable) -> Na {
-//        Na(object: vs.last)
-//    }
-//    typealias Content = Na
-//
-//    var vs: [Viewable] = []
-//}
+public extension Nav {
+    
+    var last: Viewable? {
+        stack.last
+    }
+
+    func goBack() {
+        guard !isInRootView else { return }
+        
+        stackPosition -= 1
+        NotificationCenter.default.post(Notification(name: Notification.Name("Nav_Action"), userInfo: ["action": Nav.Action.back]))
+    }
+    
+    func goForward() {
+        guard stackPosition != stack.count else { return }
+        
+        stackPosition += 1
+        NotificationCenter.default.post(Notification(name: Notification.Name("Nav_Action"), object: stack[stackPosition - 1], userInfo: ["action": Nav.Action.open]))
+
+    }
+}
 
 
