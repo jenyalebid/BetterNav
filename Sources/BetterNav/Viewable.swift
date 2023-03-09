@@ -9,6 +9,9 @@ import SwiftUI
 
 public protocol Viewable {
     
+    var viewID: UUID { get }
+    var viewName: String? { get }
+    
     var nav: Nav? { get set }
 }
 
@@ -29,18 +32,19 @@ public protocol NavModifierProtocol: ViewModifier {
     var nav: Nav { get set }
 }
 
-// Generic - Faster
-public protocol NavViewerGeneric {
-    func viewType<Content: NavHost>(as content: Content.Type, for _: Viewable?) -> Content
-}
-
-// Existential - Slower
-public protocol NavViewer {
-    associatedtype Content: NavHost
-    
-    func viewType(for _: Viewable?) -> Content
-}
-
 public protocol NavHost: View {
     var object: Viewable? { get }
 }
+
+// Generic - Faster
+//public protocol NavViewerGeneric {
+//    func viewType<Content: NavHost>(as content: Content.Type, for _: Viewable?) -> Content
+//}
+//
+// Existential - Slower
+//public protocol NavViewer {
+//    associatedtype Content: NavHost
+//
+//    func viewType(for _: Viewable?) -> Content
+//}
+//

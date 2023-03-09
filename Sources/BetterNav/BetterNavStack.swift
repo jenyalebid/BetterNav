@@ -7,20 +7,21 @@
 
 import SwiftUI
 
-public struct BetterNavStack<LocalNav: ViewModifier, Content: View>: View {
+public struct BetterNavStack<Content: View, BeforeNavContent: View>: View {
     
-    var localNav: LocalNav
+    @ObservedObject var nav: Nav
+    
     var content: Content
+    var beforeNav: BeforeNavContent
     
-    public init(nav: LocalNav, @ViewBuilder content: () -> Content) {
-        self.localNav = nav
+    public init(nav: Nav, @ViewBuilder content: () -> Content, @ViewBuilder beforeNav: () -> BeforeNavContent) {
+        self.nav = nav
         self.content = content()
+        self.beforeNav = beforeNav()
     }
     
     public var body: some View {
-        NavigationView {
-            content
-                .modifier(localNav)
-        }
+        content
+            .modifier(NavModifier(nav: nav, beforeNav: beforeNav))
     }
 }

@@ -21,16 +21,26 @@ public final class Nav: ObservableObject {
     @Published var stack = [Viewable]()
     @Published var stackPosition = 0
     
+    @Published public var currentViewable: Viewable?
+    
     public init(id: String) {
         self.id = id
         Nav.navs[id] = self
+    }
+    
+    func setView(_ view: Viewable) {
+        DispatchQueue.main.async { [self] in
+            withAnimation {
+                currentViewable = view
+            }
+        }
     }
 }
 
 extension Nav {
     
     var isInRootView: Bool {
-        stackPosition == 0
+        stackPosition == 1
     }
     
     var isInLastView: Bool {
@@ -44,9 +54,22 @@ public extension Nav {
         guard let nav = Nav.navs[nav] else {
             return
         }
+        nav.stack.removeLast(nav.stack.count - nav.stackPosition)
         nav.stack.append(object)
-        nav.stackPosition = nav.stack.count
-        NotificationCenter.default.post(Notification(name: Notification.Name("Nav_Action"), object: object, userInfo: ["action": Nav.Action.open]))
+        nav.stackPosition += 1
+        nav.setView(object)
+//        NotificationCenter.default.post(Notification(name: Notification.Name("Nav_Open"), object: object))
+    }
+    
+    static func setRootView(_ view: Viewable, in nav: String) {
+        guard let nav = Nav.navs[nav] else {
+            return
+        }
+        
+        nav.stack.removeAll()
+        nav.stackPosition = 1
+        nav.stack.append(view)
+        nav.currentViewable = view
     }
 }
 
@@ -60,15 +83,14 @@ public extension Nav {
         guard !isInRootView else { return }
         
         stackPosition -= 1
-        NotificationCenter.default.post(Notification(name: Notification.Name("Nav_Action"), userInfo: ["action": Nav.Action.back]))
+        setView(stack[stackPosition - 1])
     }
     
     func goForward() {
         guard stackPosition != stack.count else { return }
         
         stackPosition += 1
-        NotificationCenter.default.post(Notification(name: Notification.Name("Nav_Action"), object: stack[stackPosition - 1], userInfo: ["action": Nav.Action.open]))
-
+        setView(stack[stackPosition - 1])
     }
 }
 
