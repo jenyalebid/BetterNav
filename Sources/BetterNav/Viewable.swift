@@ -13,6 +13,8 @@ public protocol Viewable {
     var viewName: String? { get }
     
     var nav: Nav? { get set }
+    
+    func view<Content: View>(_: Content) -> Content?
 }
 
 public extension Viewable {
@@ -24,6 +26,10 @@ public extension Viewable {
         set {
             self.nav = newValue
         }
+    }
+    
+    func view<Content>(_: Content) -> Content? where Content : View {
+        nil
     }
 }
 

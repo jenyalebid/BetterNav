@@ -21,10 +21,16 @@ public struct BetterNavStack<Content: View, BeforeNavContent: View>: View {
     }
     
     public var body: some View {
-        NavigationView {
-            content
-                .modifier(NavModifier(nav: nav, beforeNav: beforeNav))
+        switch nav.currentViewable {
+        case let noNav as Nav.NoNav:
+            noNav.view
+                .transition(.move(edge: .bottom))
+                .id(noNav.viewID)
+        default:
+            NavigationView {
+                content
+                    .modifier(NavModifier(nav: nav, beforeNav: beforeNav))
+            }
         }
-        .navigationViewStyle(.stack)
     }
 }

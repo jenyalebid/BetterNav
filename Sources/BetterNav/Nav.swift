@@ -9,12 +9,13 @@ import SwiftUI
 
 public final class Nav: ObservableObject {
     
-    public enum Action {
-        case open
-        case back
-    }
-    
     static var navs = [String: Nav]()
+    
+    struct NoNav: Viewable {
+        var viewID = UUID()
+        var viewName: String? = nil
+        var view: AnyView
+    }
 
     var id: String
 
@@ -22,6 +23,7 @@ public final class Nav: ObservableObject {
     @Published var stackPosition = 0
     
     @Published public var currentViewable: Viewable?
+    
     
     @Published public var currentTransition = AnyTransition.asymmetric(insertion: .move(edge: .trailing), removal: .move(edge: .leading))
     
@@ -88,6 +90,15 @@ public extension Nav {
             return
         }
         nav.goForward()
+    }
+    
+    static func present(_ view: any View, in nav: String) {
+        guard let nav = Nav.navs[nav] else {
+            return
+        }
+        
+        let nonNav = NoNav(view: AnyView(view))
+        nav.currentViewable = nonNav
     }
 }
 
