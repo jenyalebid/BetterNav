@@ -21,7 +21,9 @@ public struct BetterNavStack<Content: View, BeforeNavContent: View>: View {
     }
     
     public var body: some View {
-        content
-            .modifier(NavModifier(nav: nav, beforeNav: beforeNav))
+        NavigationView {
+            content
+                .modifier(NavModifier(nav: nav, beforeNav: beforeNav))
+        }
     }
 }
