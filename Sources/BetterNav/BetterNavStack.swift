@@ -25,5 +25,6 @@ public struct BetterNavStack<Content: View, BeforeNavContent: View>: View {
             content
                 .modifier(NavModifier(nav: nav, beforeNav: beforeNav))
         }
+        .navigationViewStyle(.stack)
     }
 }

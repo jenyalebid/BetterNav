@@ -33,7 +33,7 @@ public protocol NavModifierProtocol: ViewModifier {
 }
 
 public protocol NavHost: View {
-    var object: Viewable? { get }
+    var nav: Nav { get }
 }
 
 // Generic - Faster

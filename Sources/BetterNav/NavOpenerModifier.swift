@@ -26,8 +26,8 @@ public struct NavModifier<BeforeNavContent: View>: ViewModifier {
     
     public func body(content: Content) -> some View {
         content
-            .transition(nav.currentTransition)
-            .id(nav.currentViewable?.viewID)
+//            .transition(nav.currentTransition)
+//            .id(nav.currentViewable?.viewID)
             .animation(.spring(), value: nav.currentViewable?.viewID)
             .toolbar {
                 ToolbarItemGroup(placement: .navigationBarLeading) {
@@ -70,57 +70,57 @@ extension NavModifier {
     }
 }
 
-struct NavModifier_Previews: PreviewProvider {
+//struct NavModifier_Previews: PreviewProvider {
+//
+//    //    class NavTestViewer: NavViewer {
+//    //        func viewType(for object: Viewable?) -> NavModifier_Previews.InnerNavView {
+//    //            InnerNavView(object: object)
+//    //        }
+//    //    }
+//
+//    struct ViewableTest: Viewable {
+//
+//        var viewID = UUID()
+//        var viewName: String? {
+//            nil
+//        }
+//    }
     
-    //    class NavTestViewer: NavViewer {
-    //        func viewType(for object: Viewable?) -> NavModifier_Previews.InnerNavView {
-    //            InnerNavView(object: object)
-    //        }
-    //    }
+//    struct NavTester: View {
+//
+//        @StateObject var nav = Nav(id: "Main")
+//
+//        var body: some View {
+//
+//            BetterNavStack(nav: nav) {
+//                InnerNavView(object: $nav.currentViewable)
+//            } beforeNav: {
+//
+//            }
+//            .navigationViewStyle(.stack)
+//        }
+//    }
     
-    struct ViewableTest: Viewable {
-        
-        var viewID = UUID()
-        var viewName: String? {
-            nil
-        }
-    }
-    
-    struct NavTester: View {
-        
-        @StateObject var nav = Nav(id: "Main")
-        
-        var body: some View {
-            
-            BetterNavStack(nav: nav) {
-                InnerNavView(object: $nav.currentViewable)
-            } beforeNav: {
-                
-            }
-            .navigationViewStyle(.stack)
-        }
-    }
-    
-    struct InnerNavView: NavHost {
-        
-        @Binding var object: Viewable?
-        
-        var body: some View {
-            VStack {
-                Spacer()
-                Text("View Inner #\(Int.random(in: 0...100))")
-                Spacer()
-                Button {
-                    Nav.openView(for: ViewableTest(), in: "Main")
-                } label: {
-                    Text("Next View")
-                }
-                Spacer()
-            }
-            .padding()
-            .transition(.slide)
-        }
-    }
+//    struct InnerNavView: NavHost {
+//
+//        @Binding var object: Viewable?
+//
+//        var body: some View {
+//            VStack {
+//                Spacer()
+//                Text("View Inner #\(Int.random(in: 0...100))")
+//                Spacer()
+//                Button {
+//                    Nav.openView(for: ViewableTest(), in: "Main")
+//                } label: {
+//                    Text("Next View")
+//                }
+//                Spacer()
+//            }
+//            .padding()
+//            .transition(.slide)
+//        }
+//    }
     
     //    struct LocalNavModifier: NavModifierProtocol {
     //
@@ -134,9 +134,9 @@ struct NavModifier_Previews: PreviewProvider {
     //        }
     //    }
     
-    static var previews: some View {
-        NavTester()
-    }
-}
+//    static var previews: some View {
+//        NavTester()
+//    }
+//}
 
 
