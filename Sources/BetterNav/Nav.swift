@@ -11,11 +11,11 @@ public final class Nav: ObservableObject {
     
     static var navs = [String: Nav]()
     
-    struct NoNav: Viewable {
-        var viewID = UUID()
-        var viewName: String? = nil
-        var view: AnyView
-    }
+//    struct NoNav: Viewable {
+//        var viewID = UUID()
+//        var viewName: String? = nil
+//        var view: AnyView
+//    }
 
     var id: String
 
@@ -27,9 +27,13 @@ public final class Nav: ObservableObject {
     
     @Published public var currentTransition = AnyTransition.asymmetric(insertion: .move(edge: .trailing), removal: .move(edge: .leading))
     
-    public init(id: String) {
+    public init(id: String, rootView: Viewable?) {
         self.id = id
         Nav.navs[id] = self
+        
+        if let rootView {
+            setRootView(rootView)
+        }
     }
     
     func setView(_ view: Viewable) {
@@ -71,11 +75,7 @@ public extension Nav {
         guard let nav = Nav.navs[nav] else {
             return
         }
-        
-        nav.stack.removeAll()
-        nav.stackPosition = 1
-        nav.stack.append(view)
-        nav.setView(view)
+        nav.setRootView(view)
     }
     
     static func goBack(in nav: String) {
@@ -92,14 +92,14 @@ public extension Nav {
         nav.goForward()
     }
     
-    static func present(_ view: any View, in nav: String) {
-        guard let nav = Nav.navs[nav] else {
-            return
-        }
-        
-        let nonNav = NoNav(view: AnyView(view))
-        nav.currentViewable = nonNav
-    }
+//    static func present(_ view: any View, in nav: String) {
+//        guard let nav = Nav.navs[nav] else {
+//            return
+//        }
+//
+//        let nonNav = NoNav(view: AnyView(view))
+//        nav.currentViewable = nonNav
+//    }
 }
 
 public extension Nav {
@@ -120,6 +120,13 @@ public extension Nav {
         currentTransition = AnyTransition.asymmetric(insertion: .move(edge: .trailing), removal: .move(edge: .leading))
         stackPosition += 1
         setView(stack[stackPosition - 1])
+    }
+    
+    func setRootView(_ view: Viewable) {
+        stack.removeAll()
+        stackPosition = 1
+        stack.append(view)
+        currentViewable = view
     }
 }
 

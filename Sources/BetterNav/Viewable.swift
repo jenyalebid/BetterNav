@@ -11,6 +11,7 @@ public protocol Viewable {
     
     var viewID: UUID { get }
     var viewName: String? { get }
+    var parent: Viewable? { get }
     
     var nav: Nav? { get set }
     
