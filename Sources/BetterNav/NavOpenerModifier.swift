@@ -30,6 +30,9 @@ public struct NavModifier<BeforeNavContent: View>: ViewModifier {
 //            .id(nav.currentViewable?.viewID)
             .animation(.spring(), value: nav.currentViewable?.viewID)
             .toolbar {
+                ToolbarItem(placement: .principal) {
+                    navTitle()
+                }
                 ToolbarItemGroup(placement: .navigationBarLeading) {
                     beforeNav
                     navButtons
@@ -68,6 +71,18 @@ extension NavModifier {
         }
         .buttonStyle(.plain)
         .disabled((nav.isInRootView && nav.stack.count == 1) || nav.stackPosition == nav.stack.count)
+    }
+    
+    func navTitle() -> some View {
+        HStack {
+            let title = nav.currentViewable?.title
+            if let image = title?.image {
+                image
+            }
+            if let text = title?.text {
+                Text(text)
+            }
+        }
     }
 }
 

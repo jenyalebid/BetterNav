@@ -9,21 +9,19 @@ import SwiftUI
 
 public final class Nav: ObservableObject {
     
+    public enum PreviousPosition {
+        case before
+        case after
+    }
+    
     static var navs = [String: Nav]()
     
-//    struct NoNav: Viewable {
-//        var viewID = UUID()
-//        var viewName: String? = nil
-//        var view: AnyView
-//    }
-
     var id: String
 
     @Published var stack = [Viewable]()
     @Published var stackPosition = 0
     
     @Published public var currentViewable: Viewable?
-    
     
     @Published public var currentTransition = AnyTransition.asymmetric(insertion: .move(edge: .trailing), removal: .move(edge: .leading))
     
@@ -52,11 +50,39 @@ extension Nav {
     }
     
     var isInLastView: Bool {
-        !isInRootView && stackPosition == stack.count
+        !isInRootView && stackPosition == stack.count || stack.count < 2
     }
 }
 
 public extension Nav {
+    
+    static func clearStack(for nav: String) {
+        guard let nav = Nav.navs[nav] else {
+            return
+        }
+        
+        nav.stack.removeAll()
+        nav.stackPosition = 1
+        if let current = nav.currentViewable {
+            nav.stack.append(current)
+        }
+        else {
+            nav.currentViewable = nil
+        }
+    }
+    
+    static func isPrevious(in nav: String, for view: Viewable) -> PreviousPosition? {
+        guard let nav = Nav.navs[nav] else {
+            return nil
+        }
+        if !nav.isInLastView {
+            return nav.stack[nav.stackPosition].viewID == view.viewID ? .after : nil
+        }
+        if !nav.isInRootView {
+            return nav.stack[nav.stackPosition - 2].viewID == view.viewID ? .before : nil
+        }
+        return nil
+    }
     
     static func openView(for object: Viewable, in nav: String) {
         guard let nav = Nav.navs[nav] else {
@@ -91,15 +117,6 @@ public extension Nav {
         }
         nav.goForward()
     }
-    
-//    static func present(_ view: any View, in nav: String) {
-//        guard let nav = Nav.navs[nav] else {
-//            return
-//        }
-//
-//        let nonNav = NoNav(view: AnyView(view))
-//        nav.currentViewable = nonNav
-//    }
 }
 
 public extension Nav {

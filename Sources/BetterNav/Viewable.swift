@@ -11,7 +11,9 @@ public protocol Viewable {
     
     var viewID: UUID { get }
     var viewName: String? { get }
+    
     var parent: Viewable? { get }
+    var title: Viewables.Title? { get }
     
     var nav: Nav? { get set }
     
@@ -29,9 +31,15 @@ public extension Viewable {
         }
     }
     
+    var title: Viewables.Title? {
+        nil
+    }
+    
     func view<Content>(_: Content) -> Content? where Content : View {
         nil
     }
+    
+
 }
 
 public protocol NavModifierProtocol: ViewModifier {
