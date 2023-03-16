@@ -90,8 +90,10 @@ public extension Nav {
         }
         
         nav.currentTransition = AnyTransition.asymmetric(insertion: .move(edge: .trailing), removal: .move(edge: .leading))
-        
-        nav.stack.removeLast(nav.stack.count - nav.stackPosition)
+        let removeCount = nav.stack.count - nav.stackPosition
+        if removeCount > 0 {
+            nav.stack.removeLast(removeCount)
+        }
         nav.stack.append(object)
         nav.stackPosition += 1
         nav.setView(object)
@@ -129,6 +131,10 @@ public extension Nav {
         guard !isInRootView else { return }
         currentTransition = AnyTransition.asymmetric(insertion: .move(edge: .leading), removal: .move(edge: .trailing))
         stackPosition -= 1
+        if stackPosition < 1 {
+            stackPosition = 1
+            assertionFailure("NOT a valid")
+        }
         setView(stack[stackPosition - 1])
     }
     
@@ -136,6 +142,10 @@ public extension Nav {
         guard stackPosition != stack.count else { return }
         currentTransition = AnyTransition.asymmetric(insertion: .move(edge: .trailing), removal: .move(edge: .leading))
         stackPosition += 1
+        if stackPosition > stack.count {
+            stackPosition = stack.count
+            assertionFailure("NOT a valid")
+        }
         setView(stack[stackPosition - 1])
     }
     
