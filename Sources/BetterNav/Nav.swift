@@ -29,9 +29,7 @@ public final class Nav: ObservableObject {
         self.id = id
         Nav.navs[id] = self
         
-        if let rootView {
-            setRootView(rootView)
-        }
+        setRootView(rootView)
     }
     
     func setView(_ view: Viewable) {
@@ -46,29 +44,26 @@ public final class Nav: ObservableObject {
 extension Nav {
     
     var isInRootView: Bool {
-        stackPosition == 1
+        stackPosition <= 1
     }
     
     var isInLastView: Bool {
-        !isInRootView && stackPosition == stack.count || stack.count < 2
+        !isInRootView && stackPosition == stack.count || stack.count <= 1
     }
 }
 
 public extension Nav {
+    
+    static func getNav(for nav: String) -> Nav? {
+        Nav.navs[nav]
+    }
     
     static func clearStack(for nav: String) {
         guard let nav = Nav.navs[nav] else {
             return
         }
         
-        nav.stack.removeAll()
-        nav.stackPosition = 1
-        if let current = nav.currentViewable {
-            nav.stack.append(current)
-        }
-        else {
-            nav.currentViewable = nil
-        }
+        nav.clearStack()
     }
     
     static func isPrevious(in nav: String, for view: Viewable) -> PreviousPosition? {
@@ -89,14 +84,7 @@ public extension Nav {
             return
         }
         
-        nav.currentTransition = AnyTransition.asymmetric(insertion: .move(edge: .trailing), removal: .move(edge: .leading))
-        let removeCount = nav.stack.count - nav.stackPosition
-        if removeCount > 0 {
-            nav.stack.removeLast(removeCount)
-        }
-        nav.stack.append(object)
-        nav.stackPosition += 1
-        nav.setView(object)
+        nav.openView(for: object)
     }
     
     static func setRootView(_ view: Viewable, in nav: String) {
@@ -129,31 +117,52 @@ public extension Nav {
 
     func goBack() {
         guard !isInRootView else { return }
+        
         currentTransition = AnyTransition.asymmetric(insertion: .move(edge: .leading), removal: .move(edge: .trailing))
         stackPosition -= 1
-        if stackPosition < 1 {
-            stackPosition = 1
-            assertionFailure("NOT a valid")
-        }
         setView(stack[stackPosition - 1])
     }
     
     func goForward() {
-        guard stackPosition != stack.count else { return }
+        guard !isInLastView else { return }
+        
         currentTransition = AnyTransition.asymmetric(insertion: .move(edge: .trailing), removal: .move(edge: .leading))
         stackPosition += 1
-        if stackPosition > stack.count {
-            stackPosition = stack.count
-            assertionFailure("NOT a valid")
-        }
         setView(stack[stackPosition - 1])
     }
     
-    func setRootView(_ view: Viewable) {
+    func setRootView(_ view: Viewable?) {
         stack.removeAll()
         stackPosition = 1
-        stack.append(view)
+        if let view {
+            stack.append(view)
+        }
         currentViewable = view
+    }
+    
+    func openView(for object: Viewable) {
+        currentTransition = AnyTransition.asymmetric(insertion: .move(edge: .trailing), removal: .move(edge: .leading))
+        let removeCount = stack.count - stackPosition
+        if removeCount >= 0 {
+            stack.removeLast(removeCount)
+            stack.append(object)
+            stackPosition += 1
+            setView(object)
+        }
+        else {
+            setRootView(object)
+        }
+    }
+    
+    func clearStack() {
+        stack.removeAll()
+        stackPosition = 1
+        if let currentViewable {
+            stack.append(currentViewable)
+        }
+        else {
+            currentViewable = nil
+        }
     }
 }
 

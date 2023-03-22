@@ -15,7 +15,8 @@ public protocol Viewable {
     var parent: Viewable? { get }
     var title: Viewables.Title? { get }
     
-    var nav: Nav? { get set }
+    var navName: String { get }
+    var nav: Nav? { get }
     
     func view<Content: View>(_: Content) -> Content?
 }
@@ -24,10 +25,7 @@ public extension Viewable {
     
     var nav: Nav? {
         get {
-            nil
-        }
-        set {
-            self.nav = newValue
+            Nav.getNav(for: navName)
         }
     }
     
@@ -39,7 +37,13 @@ public extension Viewable {
         nil
     }
     
-
+    func open() {
+        guard let nav else {
+            return
+        }
+        
+        nav.openView(for: self)
+    }
 }
 
 public protocol NavModifierProtocol: ViewModifier {
