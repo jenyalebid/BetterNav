@@ -44,11 +44,11 @@ public struct NavModifier<BeforeNavContent: View>: ViewModifier {
 extension NavModifier {
     
     var navButtons: some View {
-        HStack(spacing: 14) {
+        HStack(spacing: 16) {
             backward
             forward
         }
-        .padding(.leading, 8)
+        .padding(.leading, 2)
     }
     
     var backward: some View {
