@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-public struct NavModifier<BeforeNavContent: View>: ViewModifier {
+public struct NavModifier<BeforeNavContent: View, AfterNavContent: View>: ViewModifier {
     
     @Environment(\.dismiss) var dismiss
     
@@ -17,10 +17,12 @@ public struct NavModifier<BeforeNavContent: View>: ViewModifier {
     @State var object: Viewable?
     
     var beforeNav: BeforeNavContent
+    var afterNav: AfterNavContent
     
-    public init(nav: Nav, beforeNav: BeforeNavContent) {
+    public init(nav: Nav, beforeNav: BeforeNavContent, afterNav: AfterNavContent) {
         self.nav = nav
         self.beforeNav = beforeNav
+        self.afterNav = afterNav
         self._navPosition = State(wrappedValue: nav.stackPosition)
     }
     
@@ -36,6 +38,7 @@ public struct NavModifier<BeforeNavContent: View>: ViewModifier {
                 ToolbarItemGroup(placement: .navigationBarLeading) {
                     beforeNav
                     navButtons
+                    afterNav
                 }
             }
     }
@@ -44,11 +47,11 @@ public struct NavModifier<BeforeNavContent: View>: ViewModifier {
 extension NavModifier {
     
     var navButtons: some View {
-        HStack(spacing: 16) {
+        HStack(spacing: 18) {
             backward
             forward
         }
-        .padding(.leading, 2)
+        .padding(.leading, 4)
     }
     
     var backward: some View {
@@ -79,26 +82,6 @@ extension NavModifier {
     }
 }
 
-extension NavModifier {
-    
-    struct NavButton: View {
-        
-        var image: String
-        var action: () -> ()
-        
-        var body: some View {
-            Button {
-                action()
-            } label: {
-                Image(systemName: image)
-                    .foregroundColor(.accentColor)
-                    .font(.title3)
-            }
-            .buttonStyle(.plain)
-        }
-    }
-}
-
 struct NavModifier_Previews: PreviewProvider {
 
     struct ViewableTest: Viewable {
@@ -123,6 +106,8 @@ struct NavModifier_Previews: PreviewProvider {
                 InnerNavView(nav: nav)
             } beforeNav: {
 
+            } afterNav: {
+                
             }
             .navigationViewStyle(.stack)
         }
