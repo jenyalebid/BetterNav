@@ -87,7 +87,7 @@ public extension Nav {
         nav.openView(for: object)
     }
     
-    static func setRootView(_ view: Viewable, in nav: String) {
+    static func setRootView(_ view: Viewable?, in nav: String) {
         guard let nav = Nav.navs[nav] else {
             return
         }
